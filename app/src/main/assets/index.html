@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Верстак</title>
+<style>
+:root{
+  --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a; --text:#e8eaf0; --muted:#8b93a4;
+  --accent:#f5a524; --accent-ink:#1a1306; --ok:#3ecf8e; --warn:#f5a524; --err:#ff6b6b; --user:#262b36;
+  --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+.icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;flex:none}
+.icon:active{background:var(--panel2)}
+svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#app{display:flex;flex-direction:column;height:100%}
+header.top{display:flex;align-items:center;gap:6px;padding:8px 8px 6px;border-bottom:1px solid var(--line);background:var(--bg)}
+.title{flex:1;min-width:0}
+.t1{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t2{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.dot.ok{background:var(--ok)} .dot.bad{background:var(--err)} .dot.wait{background:var(--warn)}
+.chip{padding:2px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:12px}
+.ctx{display:flex;align-items:center;gap:8px;padding:4px 12px;font-size:11px;color:var(--muted)}
+.ctx .bar{flex:1;height:4px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.ctx .fill{height:100%;width:0;background:var(--ok);transition:width .3s}
+.ctx button{color:var(--accent);font-size:11px}
+main#msgs{flex:1;overflow-y:auto;padding:12px 12px 4px;scroll-behavior:smooth}
+.msg{margin:0 0 14px;max-width:100%}
+.msg.user{display:flex;justify-content:flex-end}
+.msg.user .bubble{background:var(--user);border-radius:var(--r) var(--r) 4px var(--r);padding:9px 13px;max-width:88%;white-space:pre-wrap;word-wrap:break-word}
+.msg.user .file{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.msg.assistant .content{word-wrap:break-word}
+.content p{margin:0 0 8px}.content p:last-child{margin-bottom:0}
+.content h1,.content h2,.content h3{font-size:16px;margin:12px 0 6px}
+.content ul,.content ol{margin:4px 0 8px;padding-left:22px}
+.content code{background:var(--panel2);padding:1px 5px;border-radius:6px;font:13px ui-monospace,Menlo,Consolas,monospace}
+.content a{color:var(--accent)}
+.code{background:#0b0d11;border:1px solid var(--line);border-radius:10px;margin:8px 0;overflow:hidden}
+.code-h{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)}
+.code-h button{color:var(--accent);font-size:11px}
+.code pre{margin:0;padding:10px;overflow-x:auto;font:12.5px/1.45 ui-monospace,Menlo,Consolas,monospace}
+.code pre code{background:none;padding:0}
+details.think{margin:0 0 8px;border-left:2px solid var(--line);padding-left:10px;color:var(--muted);font-size:13px}
+details.think summary{cursor:pointer;list-style:none;font-size:12px}
+details.think summary::before{content:"▸ ";} details.think[open] summary::before{content:"▾ "}
+details.think div{white-space:pre-wrap;margin-top:4px}
+.tool{border:1px solid var(--line);background:var(--panel);border-radius:12px;margin:8px 0;font-size:13px;overflow:hidden}
+.tool-h{display:flex;align-items:center;gap:8px;padding:8px 10px}
+.tool-h .nm{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tool-h .st{font-size:11px;color:var(--muted)}
+.tool-h .st.ok{color:var(--ok)} .tool-h .st.err{color:var(--err)} .tool-h .st.wait{color:var(--warn)}
+.tool pre{margin:0;padding:8px 10px;border-top:1px solid var(--line);white-space:pre-wrap;word-break:break-word;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;max-height:220px;overflow:auto;color:#c9cedb}
+.tool .approve{display:flex;gap:8px;padding:8px 10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.btn{padding:9px 14px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-weight:550}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--err)}
+.btn.small{padding:6px 10px;font-size:13px}
+.stats{font-size:11px;color:var(--muted);margin-top:4px}
+.err-box{border:1px solid #5a2a2a;background:#2a1717;color:#ffc9c9;border-radius:12px;padding:10px 12px;font-size:13px;white-space:pre-wrap}
+.summary-div{font-size:12px;color:var(--muted);text-align:center;margin:4px 0 14px}
+.summary-div details{display:inline-block;text-align:left;max-width:100%}
+.summary-div div{white-space:pre-wrap;background:var(--panel);border-radius:10px;padding:8px 10px;margin-top:6px}
+.cursor::after{content:"▍";animation:blink 1s infinite;color:var(--accent)}
+@keyframes blink{50%{opacity:0}}
+.empty{text-align:center;padding:9vh 18px 0;color:var(--muted)}
+.empty h1{color:var(--text);font-size:26px;margin:10px 0 4px;letter-spacing:-.3px}
+.empty .logo{font-size:40px}
+.sugg{display:flex;flex-direction:column;gap:8px;margin-top:22px}
+.sugg button{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px;text-align:left;color:var(--text)}
+.warnline{margin-top:18px;background:var(--panel);border:1px dashed var(--warn);border-radius:12px;padding:10px 12px;color:var(--text);font-size:13px}
+footer.composer{border-top:1px solid var(--line);padding:8px;background:var(--bg)}
+#attachments{display:flex;gap:6px;flex-wrap:wrap}
+#attachments:not(:empty){margin-bottom:6px}
+#attachments .chip button{margin-left:4px;color:var(--muted)}
+.row{display:flex;align-items:flex-end;gap:6px}
+#input{resize:none;max-height:160px;border-radius:20px;padding:10px 14px;line-height:1.4}
+#btnSend{background:var(--accent);color:var(--accent-ink);border-radius:50%;width:42px;height:42px}
+#btnSend.stop{background:var(--err);color:#fff}
+#btnSend:disabled{opacity:.4}
+#scrim{position:fixed;inset:0;background:#0009;opacity:0;pointer-events:none;transition:.2s;z-index:10}
+#scrim.on{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;bottom:0;left:0;width:84%;max-width:340px;background:var(--panel);z-index:11;transform:translateX(-102%);transition:.22s;display:flex;flex-direction:column;border-right:1px solid var(--line)}
+#drawer.on{transform:none}
+.dr-h{padding:16px 14px 10px;display:flex;align-items:center;gap:10px}
+.dr-h b{font-size:18px;flex:1}
+.dr-list{flex:1;overflow-y:auto;padding:4px 8px}
+.dr-item{display:flex;align-items:center;gap:6px;padding:10px;border-radius:10px;font-size:14px}
+.dr-item.on{background:var(--panel2)}
+.dr-item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-item small{color:var(--muted);font-size:11px}
+.dr-f{border-top:1px solid var(--line);padding:8px}
+.dr-f button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 10px;border-radius:10px;text-align:left}
+.dr-f button:active,.dr-item:active{background:var(--panel2)}
+.sheet{position:fixed;inset:0;background:var(--bg);z-index:20;transform:translateX(102%);transition:.22s;display:flex;flex-direction:column}
+.sheet.on{transform:none}
+.sheet-h{display:flex;align-items:center;gap:6px;padding:8px;border-bottom:1px solid var(--line)}
+.sheet-h b{flex:1;font-size:16px}
+.sheet-b{flex:1;overflow-y:auto;padding:14px 14px 40px}
+.sec{margin:0 0 22px}
+.sec>h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:10px}
+.card .hd{display:flex;align-items:center;gap:8px}
+.card .hd b{flex:1}
+.lbl{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
+.sw input{width:auto;transform:scale(1.25);accent-color:var(--accent)}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.status{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.status:last-child{border:0}
+.status span{flex:1}
+.status small{color:var(--muted)}
+.step{display:flex;gap:12px}
+.step .n{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px;flex:none}
+.step .b{flex:1}
+.step p{margin:2px 0 8px;font-size:13.5px;color:#cfd3dd}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.toolsel label{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0}
+.toolsel input{width:auto;accent-color:var(--accent)}
+#modal{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-radius:18px 18px 0 0;border-top:1px solid var(--line);transform:translateY(105%);transition:.2s;max-height:75%;overflow-y:auto;padding:10px 10px 18px}
+#modal.on{transform:none}
+#modal h4{margin:6px 8px 10px;font-size:14px;color:var(--muted)}
+.opt{display:block;width:100%;text-align:left;padding:12px;border-radius:12px}
+.opt.on{background:var(--panel2)}
+.opt small{display:block;color:var(--muted);font-size:12px}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#333a48;padding:8px 14px;border-radius:10px;font-size:13px;opacity:0;transition:.2s;z-index:40;pointer-events:none}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <button class="icon" id="btnMenu" aria-label="Меню"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+    <div class="title">
+      <div class="t1" id="chatTitle">Новый чат</div>
+      <div class="t2"><span class="dot" id="dot"></span><button id="backendChip" class="chip">—</button><button id="presetChip" class="chip">—</button></div>
+    </div>
+    <button class="icon" id="btnNew" aria-label="Новый чат"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  </header>
+  <div class="ctx"><span id="ctxLabel">контекст —</span><div class="bar"><div class="fill" id="ctxFill"></div></div><button id="btnCompact">сжать</button></div>
+  <main id="msgs"></main>
+  <footer class="composer">
+    <div id="attachments"></div>
+    <div class="row">
+      <button class="icon" id="btnAttach" aria-label="Прикрепить файл"><svg viewBox="0 0 24 24"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.3 3.3 0 0 1 4.7 4.7L10.2 17.7a1.7 1.7 0 0 1-2.4-2.4L15.5 7.6"/></svg></button>
+      <textarea id="input" rows="1" placeholder="Сообщение…"></textarea>
+      <button class="icon" id="btnSend" aria-label="Отправить"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+    </div>
+    <input type="file" id="file" hidden multiple>
+  </footer>
+</div>
+
+<div id="scrim"></div>
+<aside id="drawer">
+  <div class="dr-h"><span style="font-size:22px">🛠️</span><b>Верстак</b></div>
+  <div class="dr-list" id="sessionList"></div>
+  <div class="dr-f">
+    <button id="goSetup"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>Модель на телефоне</button>
+    <button id="goSettings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Настройки, навыки, память</button>
+  </div>
+</aside>
+
+<section class="sheet" id="viewSetup">
+  <div class="sheet-h"><button class="icon" data-close><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><b>Модель на телефоне</b></div>
+  <div class="sheet-b" id="setupBody"></div>
+</section>
+<section class="sheet" id="viewSettings">
+  <div class="sheet-h"><button class="icon" data-close><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button><b>Настройки</b></div>
+  <div class="sheet-b" id="settingsBody"></div>
+</section>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ======================= Хранилище ======================= */
+const KEY = 'verstak.v1';
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const hex = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => b.toString(16).padStart(2, '0')).join('');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hasNative = typeof window.Native !== 'undefined';
+
+const DEFAULT_PRESETS = [
+  { id: 'assistant', name: 'Ассистент', system: 'Ты — полезный ассистент на телефоне пользователя. Отвечай по-русски, кратко и по делу. Пользуйся инструментами, только когда они действительно нужны.', tools: ['get_datetime', 'calculate', 'memory_save', 'fetch_url'] },
+  { id: 'agent', name: 'Агент Termux', system: 'Ты — автономный агент на Android-телефоне. У тебя есть командная строка Termux и файлы в рабочей папке ~/verstak-workspace. Разбивай задачу на шаги, выполняй их инструментами, проверяй результат и в конце коротко отчитайся. Перед удалением или установкой чего-либо объясни, что собираешься сделать.', tools: ['get_datetime', 'calculate', 'memory_save', 'fetch_url', 'shell', 'list_files', 'read_file', 'write_file'] },
+  { id: 'order', name: 'Разбор заказа', system: 'Ты разбираешь письма с заказами на сборку мебели. Из присланного текста извлеки: код заказа, покупателя, адрес (отдельно отметь, чего не хватает: подъезд, этаж, домофон, шлагбаум), телефон, дату сборки, менеджера магазина и его телефон, тип столешницы. Ответь коротким списком, затем дай JSON в блоке кода. Ничего не выдумывай: если данных нет — пиши «нет данных».', tools: ['calculate'] },
+];
+const DEFAULT_BACKENDS = [
+  { id: 'phone', name: 'Телефон · llama.cpp', baseUrl: 'http://127.0.0.1:8080/v1', apiKey: '', model: '' },
+  { id: 'ollama', name: 'Телефон · Ollama', baseUrl: 'http://127.0.0.1:11434/v1', apiKey: '', model: 'qwen3:4b' },
+  { id: 'remote', name: 'Свой сервер', baseUrl: 'http://192.168.1.10:8080/v1', apiKey: '', model: '' },
+];
+
+function load() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  s = s || {};
+  s.settings = Object.assign({ temperature: 0.6, maxTokens: 2048, maxSteps: 8, autoCompact: true, ctxOverride: 0, showThinking: true,
+    bridgeUrl: 'http://127.0.0.1:8765', bridgeToken: hex(16), autoApprove: false, toolsEnabled: true }, s.settings);
+  s.backends = s.backends || structuredClone(DEFAULT_BACKENDS);
+  s.presets = s.presets || structuredClone(DEFAULT_PRESETS);
+  s.memory = s.memory || [];
+  s.sessions = s.sessions || [];
+  s.activeBackend = s.activeBackend || s.backends[0].id;
+  s.activePreset = s.activePreset || s.presets[0].id;
+  return s;
+}
+const S = load();
+let saveT;
+function save(now) {
+  clearTimeout(saveT);
+  const w = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Не удалось сохранить: ' + e.message); } };
+  now ? w() : (saveT = setTimeout(w, 300));
+}
+const backend = () => S.backends.find(b => b.id === S.activeBackend) || S.backends[0];
+const preset = id => S.presets.find(p => p.id === id) || S.presets[0];
+
+/* ======================= Сеть (через нативный мост или fetch) ======================= */
+const pending = {};
+window.__nativeStart = (id, code) => pending[id] && pending[id].start(code);
+window.__nativeChunk = (id, line) => pending[id] && pending[id].line(line);
+window.__nativeDone = (id, err) => pending[id] && pending[id].done(err);
+
+function httpStream({ method = 'GET', url, headers = {}, body = '', onLine, signal }) {
+  if (hasNative) {
+    return new Promise((resolve, reject) => {
+      const id = uid();
+      let status = 0;
+      const errLines = [];
+      let lineErr = null;
+      const finish = () => { delete pending[id]; };
+      pending[id] = {
+        start: c => { status = c; },
+        line: l => { if (status >= 400) errLines.push(l); else if (onLine && !lineErr) { try { onLine(l); } catch (e) { lineErr = e; } } },
+        done: err => {
+          finish();
+          if (signal && signal.aborted) return reject(new DOMException('Остановлено', 'AbortError'));
+          if (lineErr) return reject(lineErr);
+          if (err) return reject(new Error(err));
+          if (status >= 400) return reject(httpError(status, errLines.join('\n')));
+          resolve(status);
+        },
+      };
+      if (signal) signal.addEventListener('abort', () => { window.Native.abort(id); });
+      window.Native.request(id, method, url, JSON.stringify(headers), body || '');
+    });
+  }
+  return (async () => {
+    const res = await fetch(url, { method, headers, body: body || undefined, signal });
+    if (!res.ok) throw httpError(res.status, await res.text());
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) { onLine && onLine(buf.slice(0, i).replace(/\r$/, '')); buf = buf.slice(i + 1); }
+    }
+    if (buf) onLine && onLine(buf);
+    return res.status;
+  })();
+}
+function httpError(status, text) {
+  let msg = text;
+  try { const j = JSON.parse(text); msg = (j.error && (j.error.message || j.error)) || j.message || text; } catch (e) {}
+  const e = new Error('HTTP ' + status + ': ' + String(msg).slice(0, 500));
+  e.status = status;
+  return e;
+}
+async function httpJson(method, url, headers, body, ms = 8000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  const lines = [];
+  try {
+    await httpStream({ method, url, headers: Object.assign({ 'Content-Type': 'application/json' }, headers || {}), body: body ? JSON.stringify(body) : '', onLine: l => lines.push(l), signal: ctl.signal });
+  } finally { clearTimeout(t); }
+  const txt = lines.join('\n');
+  try { return JSON.parse(txt); } catch (e) { return { raw: txt }; }
+}
+function authHeaders(b) { return b.apiKey ? { Authorization: 'Bearer ' + b.apiKey } : {}; }
+const rootUrl = u => u.replace(/\/+$/, '').replace(/\/v1$/, '');
+
+/* ======================= Модель: потоковый ответ ======================= */
+async function chatStream({ messages, tools, signal, onUpdate, noTools }) {
+  const b = backend();
+  const body = { model: b.model || 'local', messages, stream: true, temperature: +S.settings.temperature, max_tokens: +S.settings.maxTokens, stream_options: { include_usage: true } };
+  if (tools && tools.length && !noTools) body.tools = tools;
+  const out = { content: '', reasoning: '', toolCalls: [], usage: null, timings: null, finish: null };
+  const raw = [];
+  let sawData = false;
+  await httpStream({
+    method: 'POST', url: b.baseUrl.replace(/\/+$/, '') + '/chat/completions',
+    headers: Object.assign({ 'Content-Type': 'application/json', Accept: 'text/event-stream' }, authHeaders(b)),
+    body: JSON.stringify(body), signal,
+    onLine: line => {
+      if (!line.startsWith('data:')) { if (line.trim()) raw.push(line); return; }
+      const p = line.slice(5).trim();
+      if (!p || p === '[DONE]') return;
+      sawData = true;
+      let j; try { j = JSON.parse(p); } catch (e) { return; }
+      if (j.error) throw new Error(j.error.message || JSON.stringify(j.error));
+      if (j.usage) out.usage = j.usage;
+      if (j.timings) out.timings = j.timings;
+      const ch = j.choices && j.choices[0];
+      if (!ch) return;
+      if (ch.finish_reason) out.finish = ch.finish_reason;
+      const d = ch.delta || ch.message || {};
+      if (d.content) out.content += d.content;
+      if (d.reasoning_content) out.reasoning += d.reasoning_content;
+      else if (d.reasoning) out.reasoning += d.reasoning;
+      for (const tc of d.tool_calls || []) {
+        const i = tc.index ?? out.toolCalls.length;
+        const cur = out.toolCalls[i] || (out.toolCalls[i] = { id: '', type: 'function', function: { name: '', arguments: '' } });
+        if (tc.id) cur.id = tc.id;
+        if (tc.function) {
+          if (tc.function.name) cur.function.name += tc.function.name;
+          if (tc.function.arguments) cur.function.arguments += typeof tc.function.arguments === 'string' ? tc.function.arguments : JSON.stringify(tc.function.arguments);
+        }
+      }
+      onUpdate && onUpdate(out);
+    },
+  });
+  if (!sawData && raw.length) {           // сервер ответил без потока
+    const j = JSON.parse(raw.join('\n'));
+    const m = (j.choices && j.choices[0] && j.choices[0].message) || {};
+    out.content = m.content || ''; out.reasoning = m.reasoning_content || '';
+    out.toolCalls = m.tool_calls || []; out.usage = j.usage || null;
+    onUpdate && onUpdate(out);
+  }
+  out.toolCalls = out.toolCalls.filter(Boolean).map(t => (t.id ? t : Object.assign(t, { id: 'call_' + uid() })));
+  // <think>…</think> внутри текста (некоторые модели не выделяют рассуждения отдельно)
+  const sp = splitThink(out.content);
+  if (sp.think) { out.reasoning = (out.reasoning ? out.reasoning + '\n' : '') + sp.think; out.content = sp.text; }
+  return out;
+}
+function splitThink(text) {
+  const a = text.indexOf('<think>');
+  if (a < 0) return { text, think: '' };
+  const b = text.indexOf('</think>', a);
+  if (b < 0) return { text: text.slice(0, a), think: text.slice(a + 7), open: true };
+  return { text: (text.slice(0, a) + text.slice(b + 8)).trim(), think: text.slice(a + 7, b).trim() };
+}
+
+/* ======================= Инструменты ======================= */
+async function bridge(path, payload) {
+  const st = S.settings;
+  const j = await httpJson('POST', st.bridgeUrl.replace(/\/+$/, '') + path, { 'X-Verstak-Token': st.bridgeToken }, payload, 620000);
+  if (j.error) throw new Error(j.error);
+  return j;
+}
+const CALC_OK = new Set(['sqrt', 'pow', 'abs', 'round', 'floor', 'ceil', 'sin', 'cos', 'tan', 'log', 'log10', 'exp', 'min', 'max', 'PI', 'E']);
+const TOOLS = {
+  get_datetime: { label: 'Дата и время', desc: 'Текущие дата, время и день недели на телефоне.', params: {}, run: () => new Date().toLocaleString('ru-RU', { dateStyle: 'full', timeStyle: 'short' }) },
+  calculate: { label: 'Калькулятор', desc: 'Точно вычислить арифметическое выражение. Пример: (125000*0.06)+1500', params: { expression: { type: 'string', description: 'Выражение на JavaScript-синтаксисе, ^ — степень' } }, required: ['expression'],
+    run: ({ expression }) => {
+      const e = String(expression).replace(/\^/g, '**').replace(/(\d),(\d)/g, '$1.$2');
+      if (!/^[\d\s+\-*/().%,a-zA-Z0-9]*$/.test(e)) throw new Error('недопустимые символы');
+      for (const w of e.match(/[a-zA-Z_]\w*/g) || []) if (!CALC_OK.has(w)) throw new Error('неизвестное имя: ' + w);
+      const r = Function('with(Math){return (' + e + ')}')();
+      return String(Math.round(r * 1e10) / 1e10);
+    } },
+  memory_save: { label: 'Запомнить', desc: 'Сохранить важный долговременный факт о пользователе или его делах. Он будет виден во всех будущих чатах.', params: { fact: { type: 'string', description: 'Короткий факт одной фразой' } }, required: ['fact'],
+    run: ({ fact }) => { S.memory.push({ id: uid(), text: String(fact).slice(0, 500), at: Date.now() }); save(); return 'Запомнено.'; } },
+  fetch_url: { label: 'Открыть страницу', desc: 'Загрузить веб-страницу по ссылке и вернуть её текст (без разметки).', params: { url: { type: 'string', description: 'Полная ссылка http(s)://…' } }, required: ['url'],
+    run: async ({ url }) => {
+      const lines = [];
+      await httpStream({ url, headers: { 'User-Agent': 'Mozilla/5.0 (Android) Verstak/0.1' }, onLine: l => lines.push(l), signal: AbortSignal.timeout(20000) });
+      const doc = new DOMParser().parseFromString(lines.join('\n'), 'text/html');
+      doc.querySelectorAll('script,style,noscript,svg,nav,footer').forEach(n => n.remove());
+      const t = (doc.title ? doc.title + '\n\n' : '') + (doc.body ? doc.body.innerText || doc.body.textContent : '');
+      return t.replace(/\n{3,}/g, '\n\n').replace(/[ \t]{2,}/g, ' ').trim().slice(0, 8000) || '(пустая страница)';
+    } },
+  shell: { label: 'Команда Termux', desc: 'Выполнить команду bash в Termux. Рабочая папка ~/verstak-workspace. Возвращает stdout, stderr и код выхода.', params: { command: { type: 'string' }, timeout: { type: 'integer', description: 'секунды, по умолчанию 60' } }, required: ['command'], danger: true, bridge: true,
+    run: async a => { const r = await bridge('/exec', a); return `код выхода: ${r.exit_code}\n${r.stdout ? '--- stdout ---\n' + r.stdout : ''}${r.stderr ? '\n--- stderr ---\n' + r.stderr : ''}`.trim(); } },
+  list_files: { label: 'Список файлов', desc: 'Показать файлы и папки в рабочей папке (путь относительно ~/verstak-workspace).', params: { path: { type: 'string', description: 'по умолчанию корень рабочей папки' } }, bridge: true,
+    run: async a => { const r = await bridge('/list', a); return r.entries.length ? r.entries.map(e => (e.dir ? '📁 ' : '📄 ') + e.name + (e.size != null ? `  (${e.size} б)` : '')).join('\n') : '(пусто)'; } },
+  read_file: { label: 'Прочитать файл', desc: 'Прочитать текстовый файл из рабочей папки.', params: { path: { type: 'string' } }, required: ['path'], bridge: true,
+    run: async a => (await bridge('/read', a)).content },
+  write_file: { label: 'Записать файл', desc: 'Создать или перезаписать текстовый файл в рабочей папке.', params: { path: { type: 'string' }, content: { type: 'string' } }, required: ['path', 'content'], danger: true, bridge: true,
+    run: async a => { const r = await bridge('/write', a); return `Записано ${r.bytes} байт в ${r.path}`; } },
+};
+function toolSchemas(names) {
+  return names.filter(n => TOOLS[n]).map(n => ({ type: 'function', function: { name: n, description: TOOLS[n].desc,
+    parameters: { type: 'object', properties: TOOLS[n].params, required: TOOLS[n].required || [] } } }));
+}
+
+/* ======================= Сессии и контекст ======================= */
+function newSession() {
+  const s = { id: uid(), title: 'Новый чат', created: Date.now(), updated: Date.now(), presetId: S.activePreset, messages: [], summary: '', ctxUsed: 0, autoApprove: false };
+  S.sessions.unshift(s); S.activeSession = s.id; save();
+  return s;
+}
+const session = () => S.sessions.find(s => s.id === S.activeSession) || newSession();
+
+function systemPrompt(sess) {
+  const p = preset(sess.presetId);
+  let t = p.system + '\n\nСегодня: ' + new Date().toLocaleString('ru-RU', { dateStyle: 'full', timeStyle: 'short' }) + '.';
+  if (S.memory.length) t += '\n\nЧто известно о пользователе (долговременная память):\n' + S.memory.map(m => '- ' + m.text).join('\n');
+  if (sess.summary) t += '\n\nКраткая сводка более ранней части этого разговора:\n' + sess.summary;
+  return t;
+}
+function apiMessages(sess) {
+  const out = [{ role: 'system', content: systemPrompt(sess) }];
+  for (const m of sess.messages) {
+    if (m.role === 'user') out.push({ role: 'user', content: m.content + (m.files || []).map(f => `\n\n[Файл: ${f.name}]\n\`\`\`\n${f.text}\n\`\`\``).join('') });
+    else if (m.role === 'assistant') { const a = { role: 'assistant', content: m.content || '' }; if (m.toolCalls && m.toolCalls.length) a.tool_calls = m.toolCalls; out.push(a); }
+    else if (m.role === 'tool') out.push({ role: 'tool', tool_call_id: m.toolCallId, name: m.name, content: m.content });
+  }
+  return out;
+}
+const estTokens = msgs => Math.ceil(msgs.reduce((n, m) => n + (m.content || '').length + JSON.stringify(m.tool_calls || '').length + 8, 0) / 3);
+const nCtx = () => +S.settings.ctxOverride || backend().nCtx || 8192;
+function updateCtx() {
+  const sess = session();
+  const used = Math.max(sess.ctxUsed || 0, estTokens(apiMessages(sess)));
+  const max = nCtx(), pct = Math.min(100, used / max * 100);
+  $('#ctxFill').style.width = pct + '%';
+  $('#ctxFill').style.background = pct > 80 ? 'var(--err)' : pct > 60 ? 'var(--warn)' : 'var(--ok)';
+  $('#ctxLabel').textContent = `контекст ${fmtK(used)} / ${fmtK(max)}`;
+  return used / max;
+}
+const fmtK = n => n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1) + 'k' : String(n);
+
+async function compact(sess, signal) {
+  // оставляем последние сообщения, остальное сжимаем в сводку; не разрываем цепочку «вызов инструмента → результат»
+  let cut = Math.max(0, sess.messages.length - 4);
+  while (cut > 0 && sess.messages[cut].role !== 'user') cut--;
+  if (cut <= 0) { toast('Пока нечего сжимать'); return false; }
+  const old = sess.messages.slice(0, cut);
+  const transcript = old.map(m => m.role === 'user' ? 'Пользователь: ' + m.content : m.role === 'assistant' ? 'Ассистент: ' + (m.content || '') + (m.toolCalls || []).map(t => ` [вызвал ${t.function.name} ${t.function.arguments}]`).join('') : `Результат ${m.name}: ${String(m.content).slice(0, 600)}`).join('\n');
+  const r = await chatStream({ noTools: true, signal, messages: [
+    { role: 'system', content: 'Ты сжимаешь переписку. Сохрани факты, решения, договорённости, незаконченные задачи и важные результаты инструментов. Пиши по-русски, списком, без воды.' },
+    { role: 'user', content: (sess.summary ? 'Предыдущая сводка:\n' + sess.summary + '\n\n' : '') + 'Переписка:\n' + transcript.slice(-24000) } ] });
+  sess.summary = (r.content || '').trim();
+  sess.messages = sess.messages.slice(cut);
+  sess.ctxUsed = 0; save(); render(); toast('Контекст сжат');
+  return true;
+}
+
+/* ======================= Агентный цикл ======================= */
+let running = null;
+async function send(text) {
+  const sess = session();
+  const files = attachments.splice(0);
+  renderAttachments();
+  sess.messages.push({ id: uid(), role: 'user', content: text, files });
+  if (sess.title === 'Новый чат') sess.title = (text || (files[0] && files[0].name) || 'Чат').slice(0, 48);
+  sess.updated = Date.now(); save(); render();
+  const ctl = new AbortController();
+  running = ctl; setRunning(true);
+  try {
+    if (S.settings.autoCompact && updateCtx() > 0.8 && sess.messages.length > 4) await compact(sess, ctl.signal);
+    const p = preset(sess.presetId);
+    const tools = S.settings.toolsEnabled ? toolSchemas(p.tools) : [];
+    for (let step = 0; step < +S.settings.maxSteps; step++) {
+      const msg = { id: uid(), role: 'assistant', content: '', reasoning: '', toolCalls: [], streaming: true };
+      sess.messages.push(msg); render();
+      const t0 = performance.now();
+      let r;
+      try {
+        r = await chatStream({ messages: apiMessages(sess).slice(0, -1), tools, signal: ctl.signal, onUpdate: o => {
+          const sp = splitThink(o.content);
+          msg.content = sp.text; msg.reasoning = o.reasoning + (sp.think ? sp.think : ''); msg.toolCalls = o.toolCalls.filter(Boolean);
+          scheduleRender(msg);
+        } });
+      } catch (e) {
+        if (tools.length && /tool|jinja|function/i.test(e.message) && !/abort/i.test(e.name)) e.message += '\n\nПохоже, сервер не поддерживает инструменты. Для llama.cpp нужен запуск с флагом --jinja (скрипт установки делает это сам) или выключи инструменты в настройках.';
+        throw e;
+      }
+      Object.assign(msg, { content: r.content, reasoning: r.reasoning, toolCalls: r.toolCalls, streaming: false });
+      const secs = (performance.now() - t0) / 1000;
+      const tps = r.timings && r.timings.predicted_per_second;
+      const outTok = (r.usage && r.usage.completion_tokens) || (r.timings && r.timings.predicted_n);
+      msg.stats = [outTok ? outTok + ' ток.' : '', tps ? tps.toFixed(1) + ' ток/с' : '', secs.toFixed(1) + ' с'].filter(Boolean).join(' · ');
+      if (r.usage && r.usage.total_tokens) sess.ctxUsed = r.usage.total_tokens;
+      else if (r.timings && r.timings.prompt_n != null) sess.ctxUsed = (r.timings.prompt_n + (r.timings.cache_n || 0) + (r.timings.predicted_n || 0));
+      save(); render();
+      if (!r.toolCalls.length) break;
+      for (const tc of r.toolCalls) {
+        const res = await runTool(sess, msg, tc, ctl.signal);
+        sess.messages.push({ id: uid(), role: 'tool', toolCallId: tc.id, name: tc.function.name, content: res.text, ok: res.ok });
+        save(); render();
+      }
+      if (step === +S.settings.maxSteps - 1) sess.messages.push({ id: uid(), role: 'assistant', content: '_Достигнут лимит шагов агента. Напиши «продолжай», чтобы он работал дальше._' });
+    }
+  } catch (e) {
+    const last = sess.messages[sess.messages.length - 1];
+    if (last && last.role === 'assistant' && last.streaming) { last.streaming = false; if (!last.content && !last.toolCalls.length) sess.messages.pop(); }
+    if (e.name !== 'AbortError') sess.messages.push({ id: uid(), role: 'error', content: humanError(e) });
+  } finally {
+    running = null; setRunning(false); sess.updated = Date.now(); save(); render(); updateStatus();
+  }
+}
+function humanError(e) {
+  const m = String(e.message || e);
+  if (/Failed to fetch|ECONNREFUSED|Connection refused|failed to connect|NetworkError/i.test(m))
+    return `Модель «${backend().name}» не отвечает (${backend().baseUrl}).\n\nЕсли модель на телефоне — открой «Модель на телефоне» в меню и запусти её.`;
+  return m;
+}
+const approvals = {};
+async function runTool(sess, msg, tc, signal) {
+  const name = tc.function.name, def = TOOLS[name];
+  let args = {};
+  try { args = tc.function.arguments ? JSON.parse(tc.function.arguments) : {}; } catch (e) { return { ok: false, text: 'Ошибка: аргументы не в формате JSON — ' + tc.function.arguments }; }
+  if (!def) return { ok: false, text: 'Ошибка: нет такого инструмента ' + name };
+  if (!preset(sess.presetId).tools.includes(name)) return { ok: false, text: 'Ошибка: инструмент выключен в этом навыке' };
+  if (def.danger && !S.settings.autoApprove && !sess.autoApprove) {
+    const ok = await new Promise(res => { approvals[tc.id] = res; render(); signal.addEventListener('abort', () => res(false)); });
+    delete approvals[tc.id];
+    if (!ok) return { ok: false, text: 'Пользователь отклонил это действие.' };
+  }
+  try { const out = await def.run(args); return { ok: true, text: String(out) }; }
+  catch (e) {
+    let t = 'Ошибка: ' + (e.message || e);
+    if (def.bridge && /refused|fetch|connect|401/i.test(t)) t += ' (мост Termux не запущен или неверный токен — см. «Модель на телефоне»)';
+    return { ok: false, text: t };
+  }
+}
+
+/* ======================= Отрисовка ======================= */
+function md(src) {
+  const blocks = [];
+  src = String(src || '').replace(/```([\w+-]*)[^\n]*\n?([\s\S]*?)(?:```|$)/g, (m, lang, code) => { blocks.push({ lang, code: code.replace(/\n$/, '') }); return '\n\u0000' + (blocks.length - 1) + '\u0000\n'; });
+  const inline = s => esc(s)
+    .replace(/`([^`\n]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
+    .replace(/(^|[\s(])[*_]([^*_\n]+)[*_](?=[\s).,!?:;]|$)/g, '$1<i>$2</i>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, '$1<a href="$2">$2</a>');
+  let html = '', list = null, para = [];
+  const flushP = () => { if (para.length) { html += '<p>' + para.join('<br>') + '</p>'; para = []; } };
+  const flushL = () => { if (list) { html += `</${list}>`; list = null; } };
+  for (const line of src.split('\n')) {
+    let m;
+    if ((m = line.match(/^\u0000(\d+)\u0000$/))) { flushP(); flushL(); const b = blocks[+m[1]]; html += `<div class="code"><div class="code-h"><span>${esc(b.lang || 'код')}</span><button data-copy>Копировать</button></div><pre><code>${esc(b.code)}</code></pre></div>`; }
+    else if ((m = line.match(/^(#{1,4})\s+(.*)/))) { flushP(); flushL(); html += `<h3>${inline(m[2])}</h3>`; }
+    else if ((m = line.match(/^\s*[-*•]\s+(.*)/))) { flushP(); if (list !== 'ul') { flushL(); html += '<ul>'; list = 'ul'; } html += `<li>${inline(m[1])}</li>`; }
+    else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { flushP(); if (list !== 'ol') { flushL(); html += '<ol>'; list = 'ol'; } html += `<li>${inline(m[1])}</li>`; }
+    else if (!line.trim()) { flushP(); flushL(); }
+    else { flushL(); para.push(inline(line)); }
+  }
+  flushP(); flushL();
+  return html;
+}
+function toolCard(msg, tc, sess) {
+  const res = sess.messages.find(m => m.role === 'tool' && m.toolCallId === tc.id);
+  const def = TOOLS[tc.function.name];
+  let args = tc.function.arguments || '';
+  try { const a = JSON.parse(args); args = a.command || a.expression || a.url || a.path || a.fact || JSON.stringify(a, null, 1); if (a.content) args += '\n\n' + a.content.slice(0, 1500); } catch (e) {}
+  const waiting = approvals[tc.id];
+  const st = res ? (res.ok ? '<span class="st ok">готово</span>' : '<span class="st err">ошибка</span>') : waiting ? '<span class="st wait">ждёт разрешения</span>' : (msg.streaming ? '<span class="st">готовлю…</span>' : '<span class="st wait">выполняется…</span>');
+  return `<div class="tool"><div class="tool-h"><span>${def && def.danger ? '⚠️' : '🔧'}</span><span class="nm">${esc(def ? def.label : tc.function.name)}</span>${st}</div>`
+    + (args && args !== '{}' ? `<pre>${esc(args)}</pre>` : '')
+    + (waiting ? `<div class="approve"><button class="btn primary small" data-approve="${tc.id}">Разрешить</button><button class="btn small" data-always="${tc.id}">Разрешать в этом чате</button><button class="btn danger small" data-deny="${tc.id}">Отклонить</button></div>` : '')
+    + (res ? `<details><summary style="padding:6px 10px;font-size:12px;color:var(--muted);cursor:pointer;border-top:1px solid var(--line)">результат</summary><pre>${esc(res.content.slice(0, 6000))}</pre></details>` : '')
+    + '</div>';
+}
+function msgHtml(m, sess) {
+  if (m.role === 'user') return `<div class="msg user" data-id="${m.id}"><div class="bubble">${esc(m.content)}${(m.files || []).map(f => `<span class="file">📎 ${esc(f.name)}</span>`).join('')}</div></div>`;
+  if (m.role === 'error') return `<div class="msg"><div class="err-box">${esc(m.content)}</div></div>`;
+  if (m.role !== 'assistant') return '';
+  let h = `<div class="msg assistant" data-id="${m.id}">`;
+  if (m.reasoning && S.settings.showThinking) h += `<details class="think"${m.streaming && !m.content ? ' open' : ''}><summary>${m.streaming && !m.content ? 'думает…' : 'ход мыслей'}</summary><div>${esc(m.reasoning)}</div></details>`;
+  h += `<div class="content${m.streaming && !m.toolCalls.length ? ' cursor' : ''}">${md(m.content)}</div>`;
+  for (const tc of m.toolCalls || []) h += toolCard(m, tc, sess);
+  if (m.stats) h += `<div class="stats">${esc(m.stats)}</div>`;
+  return h + '</div>';
+}
+function render() {
+  const sess = session();
+  $('#chatTitle').textContent = sess.title;
+  $('#presetChip').textContent = preset(sess.presetId).name + ' ▾';
+  $('#backendChip').textContent = backend().name + ' ▾';
+  const box = $('#msgs');
+  const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  if (!sess.messages.length) box.innerHTML = emptyHtml();
+  else box.innerHTML = (sess.summary ? `<div class="summary-div"><details><summary>— раньше в разговоре (сводка) —</summary><div>${esc(sess.summary)}</div></details></div>` : '') + sess.messages.map(m => msgHtml(m, sess)).join('');
+  if (atBottom || running) box.scrollTop = box.scrollHeight;
+  updateCtx();
+}
+let rafPending = false;
+function scheduleRender(msg) {
+  if (rafPending) return; rafPending = true;
+  requestAnimationFrame(() => {
+    rafPending = false;
+    const el = document.querySelector(`.msg[data-id="${msg.id}"]`);
+    if (!el) return render();
+    const box = $('#msgs'); const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+    el.outerHTML = msgHtml(msg, session());
+    if (atBottom) box.scrollTop = box.scrollHeight;
+  });
+}
+function emptyHtml() {
+  const p = preset(session().presetId);
+  const ideas = { assistant: ['Сколько будет 6% от 187 400 ₽?', 'Запомни: я сборщик кухонь, плата 6% от стоимости кухни', 'Открой https://example.com и перескажи коротко'],
+    agent: ['Покажи, сколько свободного места на телефоне', 'Создай файл plan.md со списком дел на завтра', 'Какая версия Python стоит в Termux?'],
+    order: ['Вставь текст письма с заказом — я разберу его по полям'] }[p.id] || ['Привет! Что ты умеешь?'];
+  return `<div class="empty"><div class="logo">🛠️</div><h1>Верстак</h1><div>Навык: <b style="color:var(--text)">${esc(p.name)}</b> · ${p.tools.length} инстр.</div>
+    <div class="sugg">${ideas.map(t => `<button data-sugg="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    ${statusOk === false ? `<div class="warnline">Модель «${esc(backend().name)}» сейчас не отвечает. <button style="color:var(--accent)" data-open="setup">Как запустить →</button></div>` : ''}</div>`;
+}
+function setRunning(on) {
+  const b = $('#btnSend');
+  b.classList.toggle('stop', on);
+  b.innerHTML = on ? '<svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5" fill="currentColor"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+}
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2200); }
+function copy(t) { if (hasNative) window.Native.copy(t); else { navigator.clipboard && navigator.clipboard.writeText(t); toast('Скопировано'); } }
+
+/* ======================= Статус бэкенда ======================= */
+let statusOk = null;
+async function updateStatus() {
+  const b = backend(), dot = $('#dot');
+  dot.className = 'dot wait';
+  try {
+    const j = await httpJson('GET', b.baseUrl.replace(/\/+$/, '') + '/models', authHeaders(b), null, 5000);
+    const ids = (j.data || j.models || []).map(m => m.id || m.name).filter(Boolean);
+    b.models = ids; if (!b.model && ids[0]) b.detected = ids[0];
+    statusOk = true; dot.className = 'dot ok';
+    try { const p = await httpJson('GET', rootUrl(b.baseUrl) + '/props', authHeaders(b), null, 4000); const n = (p.default_generation_settings && p.default_generation_settings.n_ctx) || p.n_ctx; if (n) b.nCtx = n; } catch (e) {}
+    save();
+  } catch (e) { statusOk = false; dot.className = 'dot bad'; }
+  if (!session().messages.length) render(); else updateCtx();
+  return statusOk;
+}
+
+/* ======================= Вложения ======================= */
+const attachments = [];
+function renderAttachments() { $('#attachments').innerHTML = attachments.map((f, i) => `<span class="chip">📎 ${esc(f.name)}<button data-rm="${i}">✕</button></span>`).join(''); }
+$('#file').addEventListener('change', async e => {
+  for (const f of e.target.files) {
+    if (f.size > 400000) { toast(f.name + ': слишком большой файл'); continue; }
+    const text = await f.text();
+    attachments.push({ name: f.name, text: text.slice(0, 60000) });
+  }
+  e.target.value = ''; renderAttachments();
+});
+
+/* ======================= Панели: меню, выбор, настройки, установка ======================= */
+function openDrawer(on) { $('#drawer').classList.toggle('on', on); $('#scrim').classList.toggle('on', on); if (on) renderSessions(); }
+function renderSessions() {
+  $('#sessionList').innerHTML = S.sessions.map(s => `<div class="dr-item${s.id === S.activeSession ? ' on' : ''}" data-sess="${s.id}"><span>${esc(s.title)}</span><small>${new Date(s.updated).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })}</small><button class="icon" style="width:30px;height:30px" data-delsess="${s.id}">✕</button></div>`).join('') || '<div class="hint" style="padding:10px">Чатов пока нет</div>';
+}
+function openSheet(id) { $(id).classList.add('on'); }
+function closeSheets() { document.querySelectorAll('.sheet.on').forEach(s => s.classList.remove('on')); }
+function modal(title, items, onPick) {
+  const m = $('#modal');
+  m.innerHTML = `<h4>${esc(title)}</h4>` + items.map((it, i) => `<button class="opt${it.on ? ' on' : ''}" data-i="${i}">${esc(it.title)}<small>${esc(it.sub || '')}</small></button>`).join('');
+  m.classList.add('on'); $('#scrim').classList.add('on');
+  m.onclick = e => { const b = e.target.closest('[data-i]'); if (!b) return; closeModal(); onPick(items[+b.dataset.i]); };
+}
+function closeModal() { $('#modal').classList.remove('on'); if (!$('#drawer').classList.contains('on')) $('#scrim').classList.remove('on'); }
+window.onNativeBack = () => {
+  if ($('#modal').classList.contains('on')) { closeModal(); return true; }
+  if (document.querySelector('.sheet.on')) { closeSheets(); render(); return true; }
+  if ($('#drawer').classList.contains('on')) { openDrawer(false); return true; }
+  return false;
+};
+
+function setupCommand() {
+  let script = hasNative ? window.Native.readAsset('termux/setup.sh') : (window.__setupScript || '');
+  return `export VERSTAK_TOKEN=${S.settings.bridgeToken}\ncat > ~/verstak-setup.sh <<'VERSTAK_EOF'\n${script.trim()}\nVERSTAK_EOF\nbash ~/verstak-setup.sh\n`;
+}
+async function renderSetup() {
+  const body = $('#setupBody');
+  const termux = hasNative ? window.Native.hasTermux() : null;
+  body.innerHTML = `
+  <div class="sec"><h3>Состояние</h3><div class="card">
+    <div class="status"><span>Termux</span><small id="stTermux">${termux === null ? 'нет данных (не в приложении)' : termux ? '✅ установлен' : '❌ не установлен'}</small></div>
+    <div class="status"><span>Модель (llama-server)</span><small id="stModel">проверяю…</small></div>
+    <div class="status"><span>Мост для инструментов</span><small id="stBridge">проверяю…</small></div>
+  </div><button class="btn small" id="recheck">Проверить ещё раз</button></div>
+  <div class="sec"><h3>Установка — один раз</h3>
+    <div class="card step"><div class="n">1</div><div class="b"><b>Поставь Termux</b><p>Только из F-Droid или GitHub — версия из Google Play устарела и не работает.</p>
+      <div class="btns"><button class="btn small" data-url="https://f-droid.org/packages/com.termux/">F-Droid</button><button class="btn small" data-url="https://github.com/termux/termux-app/releases">GitHub</button></div></div></div>
+    <div class="card step"><div class="n">2</div><div class="b"><b>Скопируй команду установки и вставь в Termux</b><p>Долгое нажатие в Termux → «Paste» → Enter. Скрипт поставит llama.cpp, спросит, какую модель скачать, и сам всё запустит. Займёт 5–30 минут, нужен Wi-Fi.</p>
+      <div class="btns"><button class="btn primary small" id="copySetup">Скопировать команду</button><button class="btn small" id="openTermux">Открыть Termux</button></div></div></div>
+    <div class="card step"><div class="n">3</div><div class="b"><b>Какую модель выбрать</b><p><b>1 — Qwen3 1.7B</b> (1.1 ГБ): для телефонов с 4–6 ГБ памяти, отвечает быстро, инструментами пользуется слабо.<br><b>2 — Qwen3 4B</b> (2.5 ГБ): от 8 ГБ памяти, заметно умнее и нормально вызывает инструменты.<br><b>3</b> — своя ссылка на любой .gguf.</p></div></div>
+  </div>
+  <div class="sec"><h3>Каждый день</h3><div class="card">
+    <p class="hint" style="margin:0 0 10px">После перезагрузки телефона модель нужно запустить заново. Кнопка сработает, если при первом нажатии разрешить Верстаку «запускать команды в Termux».</p>
+    <div class="btns"><button class="btn primary small" id="startModel">▶ Запустить модель</button><button class="btn small" id="stopModel">■ Остановить</button><button class="btn small" id="copyStart">Скопировать команду</button></div>
+  </div></div>`;
+  checkSetup();
+}
+async function checkSetup() {
+  const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+  try {
+    const j = await httpJson('GET', 'http://127.0.0.1:8080/health', {}, null, 3000);
+    set('stModel', j.status === 'ok' ? '✅ работает' : j.status === 'loading model' || (j.error && /load/i.test(j.error.message || '')) ? '⏳ загружается' : '⚠ ' + (j.status || 'странный ответ'));
+  } catch (e) { set('stModel', /503/.test(e.message) ? '⏳ загружается' : '❌ не запущена'); }
+  try {
+    const j = await httpJson('GET', S.settings.bridgeUrl.replace(/\/+$/, '') + '/health', { 'X-Verstak-Token': S.settings.bridgeToken }, null, 3000);
+    set('stBridge', j.ok ? (j.auth ? '✅ работает' : '⚠ работает, но токен не совпадает — переустанови командой из шага 2') : '⚠ странный ответ');
+  } catch (e) { set('stBridge', '❌ не запущен'); }
+}
+window.__nativePermission = ok => toast(ok ? 'Разрешение получено — нажми «Запустить» ещё раз' : 'Без разрешения — копируй команду и запускай в Termux вручную');
+function termuxRun(cmd, okMsg) {
+  if (!hasNative) { copy(cmd); return; }
+  const r = window.Native.termuxRun(cmd);
+  if (r === 'ok') { toast(okMsg); setTimeout(checkSetup, 4000); setTimeout(() => { checkSetup(); updateStatus(); }, 15000); }
+  else if (r === 'no_termux') toast('Сначала установи Termux (шаг 1)');
+  else if (r === 'need_permission') toast('Разреши запуск команд и нажми ещё раз');
+  else { copy(cmd); toast('Не вышло (' + r + '). Команда скопирована — вставь в Termux'); }
+}
+
+function renderSettings() {
+  const st = S.settings;
+  const body = $('#settingsBody');
+  body.innerHTML = `
+  <div class="sec"><h3>Модели (серверы)</h3>
+    ${S.backends.map(b => `<div class="card" data-b="${b.id}"><div class="hd"><b>${esc(b.name)}</b>${b.id === S.activeBackend ? '<span class="chip">активна</span>' : `<button class="btn small" data-usebk="${b.id}">выбрать</button>`}</div>
+      <label class="lbl">Название</label><input data-bf="name" value="${esc(b.name)}">
+      <label class="lbl">Адрес OpenAI-совместимого API</label><input data-bf="baseUrl" value="${esc(b.baseUrl)}" inputmode="url">
+      <label class="lbl">Модель (пусто — какая загружена${b.detected ? ': ' + esc(b.detected) : ''})</label><input data-bf="model" value="${esc(b.model)}">
+      <label class="lbl">API-ключ (если нужен)</label><input data-bf="apiKey" type="password" value="${esc(b.apiKey)}">
+      <div class="btns" style="margin-top:10px"><button class="btn small" data-testbk="${b.id}">Проверить</button>${S.backends.length > 1 ? `<button class="btn small danger" data-delbk="${b.id}">Удалить</button>` : ''}</div></div>`).join('')}
+    <button class="btn small" id="addBk">+ Добавить сервер</button>
+    <p class="hint">Подходит всё, что говорит на языке OpenAI API: llama.cpp и Ollama в Termux, LM Studio или llama.cpp на домашнем ПК в той же Wi-Fi, облачные сервисы по ключу.</p></div>
+
+  <div class="sec"><h3>Ответы</h3><div class="card">
+    <label class="lbl">Температура (0 — строго, 1 — творчески): ${st.temperature}</label><input type="range" min="0" max="1.5" step="0.1" data-s="temperature" value="${st.temperature}">
+    <label class="lbl">Максимум токенов в ответе</label><input type="number" data-s="maxTokens" value="${st.maxTokens}">
+    <label class="lbl">Размер контекста (0 — узнать у сервера, сейчас ${nCtx()})</label><input type="number" data-s="ctxOverride" value="${st.ctxOverride}">
+    <div class="sw"><span>Автосжатие контекста при 80%</span><input type="checkbox" data-s="autoCompact" ${st.autoCompact ? 'checked' : ''}></div>
+    <div class="sw"><span>Показывать ход мыслей</span><input type="checkbox" data-s="showThinking" ${st.showThinking ? 'checked' : ''}></div>
+  </div></div>
+
+  <div class="sec"><h3>Агент и инструменты</h3><div class="card">
+    <div class="sw"><span>Инструменты включены</span><input type="checkbox" data-s="toolsEnabled" ${st.toolsEnabled ? 'checked' : ''}></div>
+    <div class="sw"><span>Не спрашивать разрешения на команды и запись файлов</span><input type="checkbox" data-s="autoApprove" ${st.autoApprove ? 'checked' : ''}></div>
+    <label class="lbl">Максимум шагов агента за один запрос</label><input type="number" data-s="maxSteps" value="${st.maxSteps}">
+    <label class="lbl">Адрес моста Termux</label><input data-s="bridgeUrl" value="${esc(st.bridgeUrl)}">
+    <label class="lbl">Токен моста (вшивается в команду установки)</label><input data-s="bridgeToken" value="${esc(st.bridgeToken)}">
+  </div></div>
+
+  <div class="sec"><h3>Навыки</h3>
+    ${S.presets.map(p => `<div class="card" data-p="${p.id}"><div class="hd"><b>${esc(p.name)}</b>${S.presets.length > 1 ? `<button class="btn small danger" data-delp="${p.id}">Удалить</button>` : ''}</div>
+      <label class="lbl">Название</label><input data-pf="name" value="${esc(p.name)}">
+      <label class="lbl">Инструкция (системный промпт)</label><textarea data-pf="system" rows="5">${esc(p.system)}</textarea>
+      <label class="lbl">Инструменты</label><div class="toolsel">${Object.keys(TOOLS).map(n => `<label><input type="checkbox" data-pt="${n}" ${p.tools.includes(n) ? 'checked' : ''}>${esc(TOOLS[n].label)}${TOOLS[n].danger ? ' ⚠️' : ''}${TOOLS[n].bridge ? ' <small style="color:var(--muted)">(Termux)</small>' : ''}</label>`).join('')}</div></div>`).join('')}
+    <button class="btn small" id="addP">+ Новый навык</button></div>
+
+  <div class="sec"><h3>Память (${S.memory.length})</h3><div class="card">
+    ${S.memory.map(m => `<div class="status"><span>${esc(m.text)}</span><button class="btn small danger" data-delm="${m.id}">✕</button></div>`).join('') || '<p class="hint" style="margin:0">Пока пусто. Модель сама сохраняет сюда важное через инструмент «Запомнить», или добавь вручную.</p>'}
+    <div class="row" style="margin-top:10px"><input id="memNew" placeholder="Новый факт…"><button class="btn small" id="addM">Добавить</button></div>
+  </div></div>
+
+  <div class="sec"><h3>Данные</h3><div class="btns"><button class="btn small" id="exportAll">Скопировать резервную копию</button><button class="btn small danger" id="wipeChats">Удалить все чаты</button></div></div>
+  <p class="hint">Верстак 0.1 · всё хранится только на этом телефоне.</p>`;
+}
+
+/* ======================= События ======================= */
+document.addEventListener('click', e => {
+  const t = e.target.closest('button,[data-sess]');
+  if (!t) return;
+  const d = t.dataset;
+  if (d.copy !== undefined) { copy(t.closest('.code').querySelector('pre').textContent); return; }
+  if (d.sugg) { $('#input').value = d.sugg; autosize(); $('#input').focus(); return; }
+  if (d.open === 'setup') { openSheet('#viewSetup'); renderSetup(); return; }
+  if (d.approve || d.always || d.deny) {
+    const id = d.approve || d.always || d.deny;
+    if (d.always) session().autoApprove = true;
+    approvals[id] && approvals[id](!d.deny);
+    return;
+  }
+  if (d.rm) { attachments.splice(+d.rm, 1); renderAttachments(); return; }
+  if (d.delsess) { e.stopPropagation(); S.sessions = S.sessions.filter(s => s.id !== d.delsess); if (S.activeSession === d.delsess) S.activeSession = S.sessions[0] && S.sessions[0].id; save(); renderSessions(); render(); return; }
+  if (d.sess) { if (running) return toast('Дождись ответа или останови'); S.activeSession = d.sess; save(); openDrawer(false); render(); return; }
+  if (d.url) { hasNative ? window.Native.openUrl(d.url) : window.open(d.url); return; }
+  if (d.usebk) { S.activeBackend = d.usebk; save(); renderSettings(); updateStatus(); return; }
+  if (d.testbk) { const prev = S.activeBackend; S.activeBackend = d.testbk; updateStatus().then(ok => { toast(ok ? '✅ Отвечает' + (backend().detected ? ': ' + backend().detected : '') : '❌ Не отвечает'); S.activeBackend = prev; updateStatus(); renderSettings(); }); return; }
+  if (d.delbk) { S.backends = S.backends.filter(b => b.id !== d.delbk); if (S.activeBackend === d.delbk) S.activeBackend = S.backends[0].id; save(); renderSettings(); return; }
+  if (d.delp) { S.presets = S.presets.filter(p => p.id !== d.delp); if (!S.presets.find(p => p.id === S.activePreset)) S.activePreset = S.presets[0].id; save(); renderSettings(); return; }
+  if (d.delm) { S.memory = S.memory.filter(m => m.id !== d.delm); save(); renderSettings(); return; }
+  if (t.hasAttribute('data-close')) { closeSheets(); render(); return; }
+  switch (t.id) {
+    case 'btnMenu': openDrawer(true); break;
+    case 'btnNew': if (running) return toast('Дождись ответа или останови'); if (session().messages.length) newSession(); render(); break;
+    case 'goSetup': openDrawer(false); openSheet('#viewSetup'); renderSetup(); break;
+    case 'goSettings': openDrawer(false); openSheet('#viewSettings'); renderSettings(); break;
+    case 'btnAttach': $('#file').click(); break;
+    case 'btnCompact': if (running) return; compact(session()).catch(err => toast(humanError(err).split('\n')[0])); break;
+    case 'btnSend': if (running) { running.abort(); return; } submit(); break;
+    case 'presetChip': {
+      const sess = session();
+      modal('Навык для этого чата', S.presets.map(p => ({ title: p.name, sub: p.tools.map(n => TOOLS[n] && TOOLS[n].label).filter(Boolean).join(', ') || 'без инструментов', on: p.id === sess.presetId, id: p.id })), it => { sess.presetId = it.id; S.activePreset = it.id; save(); render(); });
+      break; }
+    case 'backendChip':
+      modal('Где работает модель', S.backends.map(b => ({ title: b.name, sub: b.baseUrl, on: b.id === S.activeBackend, id: b.id })), it => { S.activeBackend = it.id; save(); render(); updateStatus(); });
+      break;
+    case 'recheck': checkSetup(); updateStatus(); break;
+    case 'copySetup': copy(setupCommand()); break;
+    case 'openTermux': hasNative ? window.Native.openTermux() : toast('Работает только в приложении'); break;
+    case 'startModel': termuxRun('bash ~/verstak/start.sh', 'Запускаю модель, это 10–60 секунд…'); break;
+    case 'stopModel': termuxRun('bash ~/verstak/stop.sh', 'Останавливаю'); break;
+    case 'copyStart': copy('bash ~/verstak/start.sh'); break;
+    case 'addBk': S.backends.push({ id: uid(), name: 'Новый сервер', baseUrl: 'http://192.168.1.10:8080/v1', apiKey: '', model: '' }); save(); renderSettings(); break;
+    case 'addP': S.presets.push({ id: uid(), name: 'Новый навык', system: 'Ты — ', tools: ['get_datetime', 'calculate'] }); save(); renderSettings(); break;
+    case 'addM': { const v = $('#memNew').value.trim(); if (v) { S.memory.push({ id: uid(), text: v, at: Date.now() }); save(); renderSettings(); } break; }
+    case 'exportAll': copy(JSON.stringify(S)); break;
+    case 'wipeChats': if (confirm('Удалить все чаты? Это нельзя отменить.')) { S.sessions = []; newSession(); save(); renderSettings(); } break;
+  }
+});
+$('#scrim').addEventListener('click', () => { closeModal(); openDrawer(false); });
+$('#settingsBody').addEventListener('input', e => {
+  const t = e.target, val = t.type === 'checkbox' ? t.checked : t.type === 'number' || t.type === 'range' ? +t.value : t.value;
+  if (t.dataset.s) { S.settings[t.dataset.s] = val; if (t.type === 'range') t.previousElementSibling.textContent = t.previousElementSibling.textContent.replace(/[\d.]+$/, val); }
+  const bc = t.closest('[data-b]'); if (bc && t.dataset.bf) S.backends.find(b => b.id === bc.dataset.b)[t.dataset.bf] = val;
+  const pc = t.closest('[data-p]');
+  if (pc) { const p = S.presets.find(x => x.id === pc.dataset.p); if (t.dataset.pf) p[t.dataset.pf] = val; if (t.dataset.pt) p.tools = val ? [...new Set([...p.tools, t.dataset.pt])] : p.tools.filter(n => n !== t.dataset.pt); }
+  save();
+});
+const input = $('#input');
+function autosize() { input.style.height = 'auto'; input.style.height = Math.min(160, input.scrollHeight) + 'px'; }
+input.addEventListener('input', autosize);
+function submit() {
+  const text = input.value.trim();
+  if (!text && !attachments.length) return;
+  input.value = ''; autosize();
+  send(text);
+}
+
+/* ======================= Старт ======================= */
+if (!S.sessions.length) newSession();
+if (!S.activeSession || !S.sessions.find(s => s.id === S.activeSession)) S.activeSession = S.sessions[0].id;
+render();
+updateStatus();
+setInterval(() => { if (!running && !document.hidden) updateStatus(); }, 30000);
+</script>
+</body>
+</html>
